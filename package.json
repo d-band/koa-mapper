@@ -1,0 +1,85 @@
+{
+  "name": "koa-mapper",
+  "version": "0.0.1",
+  "description": "A better and smart router middleware for koa.",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "eslint --ext .js src",
+    "build": "rimraf lib && babel src --out-dir lib",
+    "prepare": "npm run build",
+    "test": "NODE_ENV=test nyc mocha --no-timeouts",
+    "report": "nyc report --reporter=html",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "start": "npm run build && node examples/index.js"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d-band/koa-mapper.git"
+  },
+  "keywords": [
+    "koa",
+    "router",
+    "route",
+    "json-schema",
+    "openapi",
+    "mapper",
+    "swagger"
+  ],
+  "author": "d-band",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d-band/koa-mapper/issues"
+  },
+  "homepage": "https://github.com/d-band/koa-mapper#readme",
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {
+    "ajv": "^6.9.2",
+    "ajv-keywords": "^3.4.0",
+    "debug": "^4.1.1",
+    "http-errors": "^1.7.2",
+    "koa-body": "^4.0.8",
+    "koa-compose": "^4.1.0",
+    "methods": "^1.1.2",
+    "moment": "^2.24.0",
+    "path-to-regexp": "^3.0.0",
+    "qs": "^6.6.0",
+    "urijs": "^1.19.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-istanbul": "^5.1.1",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.3",
+    "eslint": "^5.14.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "koa": "^2.7.0",
+    "koa-logger": "^3.2.0",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0",
+    "pre-commit": "^1.2.2",
+    "rimraf": "^2.6.3"
+  }
+}
