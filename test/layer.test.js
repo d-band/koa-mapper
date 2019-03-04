@@ -173,4 +173,57 @@ describe('Layer', () => {
       url.should.equal('/programming/how%20to%20node');
     });
   });
+  describe('Layer#bodyparser', () => {
+    const app = new Koa();
+    const mapper = new Mapper();
+    mapper.post('/users', {
+      bodyparser: true
+    }, (ctx) => {
+      ctx.body = ctx.request.body;
+    });
+    mapper.put('/users/:id', {
+      bodyparser: true,
+      params: {
+        id: { type: 'number' }
+      }
+    }, (ctx) => {
+      ctx.body = ctx.request.body;
+      ctx.body.id = ctx.params.id;
+    });
+    app.use(mapper.middleware());
+    const client = request(http.createServer(app.callback()));
+
+    it('body parser json', (done) => {
+      const user = {
+        id: 123,
+        name: 'ken',
+        roles: ['admin', 'user']
+      };
+      client.post('/users')
+        .send(user)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          res.should.have.property('body');
+          res.body.should.to.deep.equal(user);
+          done();
+        });
+    });
+    it('body parser form', (done) => {
+      const user = {
+        name: 'ken',
+        roles: ['admin', 'user']
+      };
+      client.put('/users/123')
+        .send(user)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          user.id = 123;
+          res.should.have.property('body');
+          res.body.should.to.deep.equal(user);
+          done();
+        });
+    });
+  });
 });
