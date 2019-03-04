@@ -216,9 +216,16 @@ export default class Layer {
     if (validate) {
       const valid = validate(params);
       ctx.paramsErrors = validate.errors;
-      if (!valid && opts.throwParamsError) {
-        const msgs = (ctx.paramsErrors || []).map(e => e.message);
-        ctx.throw(400, msgs.join('\n'));
+      if (!valid && opts.throwParamsError !== false) {
+        if (typeof opts.throwParamsError === 'function') {
+          opts.throwParamsError(ctx.paramsErrors);
+        } else {
+          const msgs = ctx.paramsErrors.map((e) => {
+            const key = e.dataPath.substring(1);
+            return `[${key}] ${e.message}`;
+          });
+          ctx.throw(400, msgs.join('\n'));
+        }
       }
     }
     return params;

@@ -4,9 +4,9 @@ import File from 'formidable/lib/file';
 import { assert, transformExtends, transformType, ref } from './utils';
 
 const converts = {
-  'date': v => moment.utc(v, 'YYYY-MM-DD'),
-  'time': v => moment.utc(v, 'HH:mm:ssZ.SSS'),
-  'date-time': v => moment.utc(v)
+  'date': v => moment.utc(v, 'YYYY-MM-DD').toDate(),
+  'time': v => moment.utc(v, 'HH:mm:ssZ.SSS').toDate(),
+  'date-time': v => moment.utc(v).toDate()
 };
 
 export default class Validator {

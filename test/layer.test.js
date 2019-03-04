@@ -102,7 +102,6 @@ describe('Layer', () => {
         ctx.body = ctx.user;
       }]);
       route.param('user', (id, ctx, next) => {
-        console.log('hello');
         ctx.user = { name: 'alex' };
         if (!id) {
           ctx.status = 404;

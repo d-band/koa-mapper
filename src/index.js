@@ -208,12 +208,13 @@ export default class Mapper {
     // create route
     const route = new Layer(path, methods, middlewares, {
       ...opts,
+      prefix: this.opts.prefix || '',
+      validator: this.validator,
       end: opts.end === false ? opts.end : true,
       sensitive: opts.sensitive || this.opts.sensitive || false,
       strict: opts.strict || this.opts.strict || false,
-      prefix: this.opts.prefix || '',
-      validator: this.validator,
-      bodyparser: opts.bodyparser || this.opts.bodyparser
+      bodyparser: opts.bodyparser || this.opts.bodyparser,
+      throwParamsError: opts.throwParamsError || this.opts.throwParamsError
     });
 
     // add parameter middlewares

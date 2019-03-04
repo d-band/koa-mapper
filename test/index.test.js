@@ -18,7 +18,7 @@ const should = chai.should();
 describe('Mapper', () => {
   it('creates new mapper with koa app', (done) => {
     const mapper = new Mapper();
-    mapper.should.be.instanceOf(Mapper);
+    mapper.should.be.instanceof(Mapper);
     done();
   });
 
@@ -1035,7 +1035,7 @@ describe('Mapper', () => {
       mapper.register.should.be.a('function');
       mapper.register('/', ['GET', 'POST'], () => {});
       app.use(mapper.routes());
-      mapper.stack.should.be.an.instanceOf(Array);
+      mapper.stack.should.be.an.instanceof(Array);
       mapper.stack.should.have.property('length', 2);
       mapper.stack[1].should.have.property('path', '/');
       done();
@@ -1051,7 +1051,7 @@ describe('Mapper', () => {
       mapper.redirect('/source', '/destination', 302);
       app.use(mapper.routes());
       mapper.stack.should.have.property('length', 2);
-      mapper.stack[1].should.be.instanceOf(Layer);
+      mapper.stack[1].should.be.instanceof(Layer);
       mapper.stack[1].should.have.property('path', '/source');
       done();
     });
