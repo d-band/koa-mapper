@@ -1,3 +1,4 @@
+import qs from 'qs';
 export const debug = require('debug')('koa-mapper');
 
 export function safeDecodeURIComponent(text) {
@@ -17,6 +18,20 @@ export function layerId() {
 export function assert(value, message) {
   if (value) return;
   throw new Error(message);
+}
+
+export function toURI(base, query) {
+  if (!query) return base;
+  if (typeof query === 'string') {
+    query = qs.parse(query);
+  }
+  const str = qs.stringify(query);
+  if (!str) return base;
+  if (base.indexOf('?') >= 0) {
+    return `${base}&${str}`;
+  } else {
+    return `${base}?${str}`;
+  }
 }
 
 export function takeInOptions(opts, key) {

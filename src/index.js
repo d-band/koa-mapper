@@ -109,6 +109,7 @@ export default class Mapper {
         });
       }
     });
+    return this;
   }
 
   prefix(path) {
@@ -194,7 +195,8 @@ export default class Mapper {
     };
   }
 
-  register(path, methods, middlewares, opts = {}) {
+  register(path, methods, middlewares, opts) {
+    opts = opts || {};
     // support array of paths
     if (Array.isArray(path)) {
       path.forEach((p) => {
@@ -231,6 +233,21 @@ export default class Mapper {
     const route = this.route(name);
     assert(route, `No route found for name: ${name}`);
     return route.url(...args);
+  }
+
+  redirect(source, destination, code) {
+    // lookup source route by name
+    if (source[0] !== '/') {
+      source = this.url(source);
+    }
+    // lookup destination route by name
+    if (destination[0] !== '/') {
+      destination = this.url(destination);
+    }
+    return this.all(source, (ctx) => {
+      ctx.redirect(destination);
+      ctx.status = code || 301;
+    });
   }
 
   match(path, method) {

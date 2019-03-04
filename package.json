@@ -4,7 +4,7 @@
   "description": "A better and smart router middleware for koa.",
   "main": "lib/index.js",
   "scripts": {
-    "lint": "eslint --ext .js src",
+    "lint": "eslint --ext .js src test",
     "build": "rimraf lib && babel src --out-dir lib",
     "prepare": "npm run build",
     "test": "NODE_ENV=test nyc mocha --no-timeouts",
@@ -49,7 +49,6 @@
   },
   "dependencies": {
     "ajv": "^6.9.2",
-    "ajv-keywords": "^3.4.0",
     "debug": "^4.1.1",
     "http-errors": "^1.7.2",
     "koa-body": "^4.0.8",
@@ -57,8 +56,7 @@
     "methods": "^1.1.2",
     "moment": "^2.24.0",
     "path-to-regexp": "^3.0.0",
-    "qs": "^6.6.0",
-    "urijs": "^1.19.1"
+    "qs": "^6.6.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -80,6 +78,7 @@
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
     "pre-commit": "^1.2.2",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.6.3",
+    "supertest": "^3.4.2"
   }
 }

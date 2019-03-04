@@ -2,7 +2,7 @@ import qs from 'qs';
 import ptr from 'path-to-regexp';
 import bodyParser from 'koa-body';
 import {
-  debug, assert, safeDecodeURIComponent, takeInOptions, transformType, layerId
+  debug, assert, safeDecodeURIComponent, takeInOptions, transformType, layerId, toURI
 } from './utils';
 
 export default class Layer {
@@ -27,12 +27,12 @@ export default class Layer {
 
     // ensure middleware is a function
     this.stack.forEach((fn) => {
-      const msg = `${methods} ${this.opts.name || path}: middleware must be a function.`;
+      const msg = `${methods} ${this.opts.name || path}: middleware must be a function`;
       assert(typeof fn === 'function', msg);
     });
 
     this.path = path;
-    this.setPrefix(this.opts.prefix);
+    this.setPrefix(this.opts.prefix || '');
     this.setBodyParser();
   }
 
@@ -63,10 +63,11 @@ export default class Layer {
 
     const inPath = {};
     const parameters = pathKeys.map((key, index) => {
-      inPath[key.name] = { index };
+      const name = String(key.name);
+      inPath[name] = { index };
       return {
+        name,
         in: 'path',
-        name: key.name,
         required: !key.optional,
         schema: { type: 'string' }
       };
@@ -110,6 +111,7 @@ export default class Layer {
     });
     if (!hasProps) return null;
     const { validator } = this.opts;
+    if (!validator) return null;
     this.paramsValidate = validator.compile({
       type: 'object',
       properties,
@@ -129,7 +131,9 @@ export default class Layer {
   setPrefix(prefix) {
     if (this.path) {
       this.path = prefix + this.path;
-
+      if (/.+\/$/.test(this.path)) {
+        this.path = this.path.replace(/\/$/, '');
+      }
       debug('defined route %s %s', this.methods, this.path);
 
       const tokens = ptr.parse(this.path, this.opts);
@@ -146,11 +150,7 @@ export default class Layer {
         }
         const toPath = ptr.tokensToFunction(tokens);
         const base = toPath(replace, options);
-        if (options.query) {
-          const query = qs.stringify(options.query || {});
-          if (query) return `${base}?${query}`;
-        }
-        return base;
+        return toURI(base, options.query);
       };
       this.pathTemplate = () => {
         const obj = this.pathKeys.reduce((memo, k) => {
