@@ -4,7 +4,7 @@
 [![NPM downloads](https://img.shields.io/npm/dm/koa-mapper.svg)](https://www.npmjs.com/package/koa-mapper)
 [![Dependency Status](https://david-dm.org/d-band/koa-mapper.svg)](https://david-dm.org/d-band/koa-mapper)
 [![Build Status](https://travis-ci.org/d-band/koa-mapper.svg?branch=master)](https://travis-ci.org/d-band/koa-mapper)
-[![Coverage Status](https://coveralls.io/repos/github/d-band/koa-mapper/badge.svg?branch=master)](https://coveralls.io/github/d-band/koa-mapper?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/d-band/koa-mapper/badge.svg?branch=master)](https://coveralls.io/github/d-band/koa-mapper?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/d-band/koa-mapper.svg)](https://greenkeeper.io/)
 
 > `koa-mapper` is a better and smart router middleware for koa.
 
