@@ -43,6 +43,25 @@ mapper.addServer({
   description: 'Development'
 });
 
+mapper.get('/', ctx => {
+  ctx.body = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Document</title>
+    </head>
+    <body>
+      <form enctype="multipart/form-data" method="post" action="/pet/123/uploadImage">
+        <input name="name" type="text" />
+        <input name="image" type="file" />
+        <input type="submit" value="submit" />
+      </form>
+    </body>
+    </html>
+  `;
+});
+
 mapper.post('/pet', {
   tags: ['pet'],
   summary: 'Add a new pet to the store',
@@ -199,20 +218,22 @@ mapper.del('/pet/:petId', {
 }, (ctx) => { ctx.body = {}; });
 
 mapper.post('/pet/:petId/uploadImage', {
+  bodyparser: { multipart: true },
   tags: ['pet'],
   summary: 'uploads an image',
   operationId: 'uploadFile',
   params: {
     petId: {
       type: 'integer',
-      format: 'int64',
+      // format: 'int64',
       description: 'ID of pet to update',
       required: true
     }
   },
   body: {
     image: {
-      type: 'file'
+      type: 'file',
+      required: true
     }
   },
   responses: {
@@ -222,7 +243,9 @@ mapper.post('/pet/:petId/uploadImage', {
       }
     }
   }
-}, (ctx) => { ctx.body = {}; });
+}, (ctx) => {
+  ctx.body = {};
+});
 
 mapper.schema('Tag', {
   id: { type: 'integer', format: 'int64' },
