@@ -1,12 +1,13 @@
 const Koa = require('koa');
 const logger = require('koa-logger');
-const Mapper = require('./lib').default;
+const Mapper = require('../lib').default;
 
 const app = new Koa();
 
 app.use(logger());
 
 const mapper = new Mapper();
+
 mapper.get('/users/:id', {
   params: {
     id: { type: 'number' },
@@ -15,6 +16,15 @@ mapper.get('/users/:id', {
 }, (ctx) => {
   ctx.body = ctx.params;
 });
+
+mapper.post('/users', {
+  body: {
+    type: 'User'
+  }
+}, ctx => {
+  ctx.body = ctx.request.body;
+});
+
 mapper.define('User', {
   id: { type: 'number', required: true },
   name: { type: 'string', required: true }

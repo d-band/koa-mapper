@@ -10,6 +10,272 @@ import { expect } from 'chai';
 import Mapper from '../src/index';
 
 describe('OpenAPI', () => {
+  it('mapper with custom openURL', (done) => {
+    const app = new Koa();
+    const mapper = new Mapper({ openURL: '/swagger' });
+    mapper.get('/users/:user', (ctx) => {
+      ctx.body = ctx.params;
+    });
+    app.use(mapper.routes());
+    request(http.createServer(app.callback()))
+      .get('/swagger')
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('paths');
+        expect(res.body.paths).to.have.property('/swagger');
+        expect(res.body.paths).to.have.property('/users/{user}');
+        done();
+      });
+  });
+
+  it('mapper with openURL = false', (done) => {
+    const app = new Koa();
+    const mapper = new Mapper({ openURL: false });
+    app.use(mapper.routes());
+    request(http.createServer(app.callback()))
+      .get('/openapi.json')
+      .expect(404)
+      .end(done);
+  });
+
+  describe('mapper route with no method or no params validate', () => {
+    const app = new Koa();
+    const mapper = new Mapper();
+    let counter = 0;
+    mapper.use((ctx, next) => {
+      counter++;
+      ctx.params = { id: 123 };
+      return next();
+    });
+    mapper.get('/users/:user', (ctx, next) => {
+      counter++;
+      ctx.params.id = 345;
+      return next();
+    });
+    mapper.register('/users/:user', [], (ctx, next) => {
+      counter++;
+      ctx.body = ctx.params;
+      return next();
+    }, {
+      summary: 'user api',
+      params: {
+        user: { type: 'number' },
+        type: { type: 'number', in: 'query' }
+      }
+    });
+    mapper.get('/', {
+      params: {
+        name: { in: 'query' }
+      }
+    }, (ctx) => {
+      ctx.body = ctx.params;
+    });
+    app.use(mapper.routes());
+    const client = request(http.createServer(app.callback()));
+    it('get openapi.json', (done) => {
+      client.get('/openapi.json')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body).to.have.property('paths');
+          expect(res.body.paths).to.have.property('/users/{user}');
+          expect(res.body.paths['/users/{user}']).to.have.property('get');
+          expect(res.body.paths['/users/{user}']).to.have.property('parameters');
+          expect(res.body.paths['/users/{user}']).to.have.property('summary', 'user api');
+          done();
+        });
+    });
+
+    it('get users api', (done) => {
+      client.get('/users/333?type=1')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(counter).to.equal(3);
+          expect(res.body).to.deep.equal({
+            id: 345,
+            user: 333,
+            type: 1
+          });
+          done();
+        });
+    });
+
+    it('get with no validate', (done) => {
+      client.get('?id=123&name=456')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(counter).to.equal(4);
+          expect(res.body).to.deep.equal({
+            id: 123,
+            name: '456'
+          });
+          done();
+        });
+    });
+  });
+
+  describe('mapper route with no body validate', () => {
+    const app = new Koa();
+    const mapper = new Mapper();
+    mapper.post('/users', {
+      bodyparser: true,
+      body: {}
+    }, (ctx, next) => {
+      ctx.body = ctx.request.body;
+    });
+    mapper.post('/nobody', {
+      bodyparser: true
+    }, (ctx, next) => {
+      ctx.body = ctx.request.body;
+    });
+    app.use(mapper.routes());
+    const client = request(http.createServer(app.callback()));
+
+    it('no body validate with body {}', (done) => {
+      client.post('/users')
+        .send('id=123&name=456')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body).to.deep.equal({
+            id: '123',
+            name: '456'
+          });
+          done();
+        });
+    });
+
+    it('no body validate with body undefined', (done) => {
+      client.post('/users')
+        .send('id=123&name=456')
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body).to.deep.equal({
+            id: '123',
+            name: '456'
+          });
+          done();
+        });
+    });
+  });
+
+  it('mapper route with body schema', (done) => {
+    const app = new Koa();
+    const mapper = new Mapper();
+    mapper.define('User', {
+      id: { type: 'number' },
+      name: { type: 'string' }
+    }, {
+      required: ['id', 'name']
+    });
+
+    mapper.post('/users', {
+      body: 'User',
+      bodyType: 'json',
+      summary: 'users post api'
+    }, (ctx, next) => {
+      ctx.body = ctx.request.body;
+    });
+
+    mapper.post('/users2', {
+      body: 'User',
+      bodyType: 'multipart/mixed'
+    }, (ctx, next) => {
+      ctx.body = ctx.request.body;
+    });
+
+    mapper.put('/users/:id', {
+      body: {
+        name: { type: 'string', required: true }
+      }
+    }, (ctx, next) => {
+      ctx.body = ctx.request.body;
+    });
+    mapper.register('/users', [], (ctx) => {
+      ctx.body = ctx.request.body;
+    }, {
+      summary: 'users api'
+    });
+    app.use(mapper.routes());
+    request(http.createServer(app.callback()))
+      .get('/openapi.json')
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('paths');
+        expect(res.body.paths).to.have.property('/users');
+        expect(res.body.paths).to.have.property('/users2');
+        expect(res.body.paths).to.have.property('/users/{id}');
+        expect(res.body.paths['/users']).to.deep.equal({
+          summary: 'users api',
+          post: {
+            summary: 'users post api',
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/User'
+                  }
+                }
+              }
+            }
+          }
+        });
+        expect(res.body.paths['/users2']).to.deep.equal({
+          post: {
+            requestBody: {
+              content: {
+                'multipart/mixed': {
+                  schema: {
+                    $ref: '#/components/schemas/User'
+                  }
+                }
+              }
+            }
+          }
+        });
+        expect(res.body.paths['/users/{id}']).to.deep.equal({
+          put: {
+            parameters: [{
+              in: 'path',
+              name: 'id',
+              required: true,
+              schema: {
+                type: 'string'
+              }
+            }],
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string' }
+                    },
+                    required: ['name']
+                  }
+                },
+                'application/x-www-form-urlencoded': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string' }
+                    },
+                    required: ['name']
+                  }
+                }
+              }
+            }
+          }
+        });
+        done();
+      });
+  });
+
   describe('simple params', () => {
     const app = new Koa();
     const mapper = new Mapper();

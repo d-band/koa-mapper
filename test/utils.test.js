@@ -36,9 +36,15 @@ describe('utils', () => {
       allOf: [{ $ref: '#/components/schemas/Model' }, { $ref: '#/components/schemas/User' }]
     });
     expect(() => utils.getMixType('number|string&date')).to.throw('& and | can only have one');
+    // eslint-disable-next-line no-unused-expressions
+    expect(utils.getMixType('   |   |   ')).to.be.undefined;
   });
   it('utils#transformExtends()', () => {
     expect(utils.transformExtends('User')).to.deep.equal({
+      name: 'User',
+      parents: []
+    });
+    expect(utils.transformExtends('User:   ,   ,   ')).to.deep.equal({
       name: 'User',
       parents: []
     });
@@ -96,5 +102,36 @@ describe('utils', () => {
       tags: 'test',
       test: 'hello'
     }, 'method')).to.deep.equal({ summary: 'test', tags: 'test' });
+  });
+  it('utils#propsToSchema()', () => {
+    expect(utils.propsToSchema('User')).to.deep.equal({
+      $ref: '#/components/schemas/User'
+    });
+    // eslint-disable-next-line no-unused-expressions
+    expect(utils.propsToSchema()).to.be.null;
+    expect(utils.propsToSchema({
+      id: { type: 'number' },
+      list: { type: 'array<number>' }
+    })).to.deep.equal({
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        list: { type: 'array', items: { type: 'number' } }
+      },
+      required: []
+    });
+    expect(utils.propsToSchema({
+      id: { type: 'number', required: true },
+      list: { type: 'array<number>' }
+    }, {
+      required: ['id', 'list']
+    })).to.deep.equal({
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        list: { type: 'array', items: { type: 'number' } }
+      },
+      required: ['id', 'list']
+    });
   });
 });

@@ -1,6 +1,7 @@
 import allMethods from 'methods';
 import compose from 'koa-compose';
 import HttpError from 'http-errors';
+import extend from 'extend';
 import Layer from './layer';
 import Validator from './validator';
 import { debug, assert } from './utils';
@@ -54,7 +55,7 @@ export default class Mapper {
       const { schemas } = validator;
       const paths = {};
       stack.forEach((layer) => {
-        Object.assign(paths, layer.getPathItem());
+        extend(true, paths, layer.getPathItem());
       });
       ctx.body = { ...rootDoc, paths, components: { schemas } };
     };

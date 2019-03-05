@@ -3,6 +3,7 @@
  */
 
 import Koa from 'koa';
+import qs from 'qs';
 import http from 'http';
 import request from 'supertest';
 import chai from 'chai';
@@ -176,13 +177,23 @@ describe('Layer', () => {
   describe('Layer#bodyparser', () => {
     const app = new Koa();
     const mapper = new Mapper();
+    const props = {
+      id: { type: 'number' },
+      name: { type: 'string' },
+      roles: { type: 'array<string>' }
+    };
+    mapper.define('User', props, {
+      required: ['id', 'name']
+    });
     mapper.post('/users', {
-      bodyparser: true
+      name: 'addUser',
+      body: 'User'
     }, (ctx) => {
       ctx.body = ctx.request.body;
     });
     mapper.put('/users/:id', {
       bodyparser: true,
+      body: props,
       params: {
         id: { type: 'number' }
       }
@@ -193,14 +204,14 @@ describe('Layer', () => {
     app.use(mapper.middleware());
     const client = request(http.createServer(app.callback()));
 
-    it('body parser json', (done) => {
+    it('body parser form', (done) => {
       const user = {
         id: 123,
         name: 'ken',
         roles: ['admin', 'user']
       };
       client.post('/users')
-        .send(user)
+        .send(qs.stringify(user))
         .expect(200)
         .end((err, res) => {
           if (err) return done(err);
@@ -209,7 +220,45 @@ describe('Layer', () => {
           done();
         });
     });
-    it('body parser form', (done) => {
+
+    it('body parser form error', (done) => {
+      const user = {
+        name: 'ken',
+        roles: ['admin', 'user']
+      };
+      client.post('/users')
+        .send(qs.stringify(user))
+        .expect(400)
+        .end((err, res) => {
+          if (err) return done(err);
+          res.text.should.to.equal('should have required property \'id\'');
+          done();
+        });
+    });
+
+    it('body parser form custom error', (done) => {
+      mapper.route('addUser').opts.throwBodyError = (errors) => {
+        errors[0].message.should.to.equal('should have required property \'id\'');
+        const err = new Error('custom error');
+        err.status = 403;
+        err.expose = true;
+        throw err;
+      };
+      const user = {
+        name: 'ken',
+        roles: ['admin', 'user']
+      };
+      client.post('/users')
+        .send(qs.stringify(user))
+        .expect(403)
+        .end((err, res) => {
+          if (err) return done(err);
+          res.text.should.to.equal('custom error');
+          done();
+        });
+    });
+
+    it('body parser json', (done) => {
       const user = {
         name: 'ken',
         roles: ['admin', 'user']

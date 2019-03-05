@@ -1,8 +1,10 @@
 import qs from 'qs';
+import extend from 'extend';
 import ptr from 'path-to-regexp';
 import bodyParser from 'koa-body';
 import {
-  debug, assert, safeDecodeURIComponent, takeInOptions, transformType, layerId, toURI
+  debug, assert, safeDecodeURIComponent, takeInOptions,
+  transformType, layerId, toURI, validateError, propsToSchema
 } from './utils';
 
 export default class Layer {
@@ -47,12 +49,31 @@ export default class Layer {
     let tmp = {};
     if (operations.length) {
       const obj = takeInOptions(opts, 'method');
+      if (parameters.length) {
+        extend(true, obj, { parameters });
+      }
+      if (this.bodySchema) {
+        const map = {
+          json: 'application/json',
+          form: 'application/x-www-form-urlencoded',
+          multipart: 'multipart/form-data'
+        };
+        const bodyType = opts.bodyType || ['json', 'form'];
+        const requestBody = { content: {} };
+        [].concat(bodyType).forEach((t) => {
+          const type = map[t] || t;
+          requestBody.content[type] = { schema: this.bodySchema };
+        });
+        extend(true, obj, { requestBody });
+      }
       operations.forEach((m) => {
-        tmp[m.toLowerCase()] = { ...obj, parameters };
+        tmp[m.toLowerCase()] = obj;
       });
     } else {
-      const obj = takeInOptions(opts, 'path');
-      tmp = { ...obj, parameters };
+      tmp = takeInOptions(opts, 'path');
+      if (parameters.length) {
+        extend(true, tmp, { parameters });
+      }
     }
     return { [path]: tmp };
   }
@@ -123,8 +144,31 @@ export default class Layer {
   setBodyParser() {
     const { body, bodyparser } = this.opts;
     if (bodyparser || body) {
+      this.setBodyValidate();
       const options = bodyparser === true ? {} : bodyparser;
       this.stack.unshift(bodyParser(options));
+    }
+  }
+
+  setBodyValidate() {
+    const { body, validator } = this.opts;
+    if (!body || !validator) return;
+    this.bodySchema = propsToSchema(body);
+    if (this.bodySchema) {
+      this.bodyValidate = validator.compile(this.bodySchema);
+      this.stack.unshift((ctx, next) => {
+        const { throwBodyError } = this.opts;
+        const valid = this.bodyValidate(ctx.request.body);
+        ctx.bodyErrors = this.bodyValidate.errors;
+        if (!valid && throwBodyError !== false) {
+          if (typeof throwBodyError === 'function') {
+            throwBodyError(ctx.bodyErrors);
+          } else {
+            validateError(ctx.bodyErrors);
+          }
+        }
+        return next();
+      });
     }
   }
 
@@ -220,11 +264,7 @@ export default class Layer {
         if (typeof opts.throwParamsError === 'function') {
           opts.throwParamsError(ctx.paramsErrors);
         } else {
-          const msgs = ctx.paramsErrors.map((e) => {
-            const key = e.dataPath.substring(1);
-            return `[${key}] ${e.message}`;
-          });
-          ctx.throw(400, msgs.join('\n'));
+          validateError(ctx.paramsErrors);
         }
       }
     }

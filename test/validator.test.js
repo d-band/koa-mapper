@@ -140,6 +140,7 @@ describe('Validator', () => {
     validator.addSchema('Model', {
       id: { type: 'number', required: true }
     });
+    validator.addSchema('Info: User');
     const validate = validator.compile({
       type: 'object',
       properties: {
@@ -148,6 +149,9 @@ describe('Validator', () => {
       }
     });
     expect(validator.getSchemas()).to.deep.equal({
+      Info: {
+        $ref: '#/components/schemas/User'
+      },
       Model: {
         type: 'object',
         properties: {

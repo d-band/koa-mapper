@@ -50,6 +50,7 @@
   "dependencies": {
     "ajv": "^6.9.2",
     "debug": "^4.1.1",
+    "extend": "^3.0.2",
     "http-errors": "^1.7.2",
     "koa-body": "^4.0.8",
     "koa-compose": "^4.1.0",

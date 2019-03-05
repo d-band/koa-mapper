@@ -20,6 +20,21 @@ export function assert(value, message) {
   throw new Error(message);
 }
 
+export function validateError(errors) {
+  const message = errors.map((e) => {
+    if (e.dataPath) {
+      const key = e.dataPath.replace(/^./, '');
+      return `[${key}] ${e.message}`;
+    } else {
+      return e.message;
+    }
+  }).join('\n');
+  const err = new Error(message);
+  err.status = 400;
+  err.expose = true;
+  throw err;
+}
+
 export function toURI(base, query) {
   if (!query) return base;
   if (typeof query === 'string') {
@@ -119,4 +134,25 @@ export function transformType(type) {
   } else {
     return getMixType(type);
   }
+}
+
+export function propsToSchema(props, options = {}) {
+  if (props && typeof props === 'string') {
+    return { $ref: ref(props) };
+  }
+  if (props && Object.keys(props).length) {
+    const properties = {};
+    const requiredArr = options.required || [];
+    Object.keys(props).forEach((k) => {
+      const { type, required, ...others } = props[k];
+      const typeObj = transformType(type);
+      properties[k] = { ...typeObj, ...others };
+      if (required) {
+        requiredArr.push(k);
+      }
+    });
+    const required = [...new Set(requiredArr)];
+    return { type: 'object', properties, required };
+  }
+  return null;
 }

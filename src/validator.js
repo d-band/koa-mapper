@@ -1,7 +1,9 @@
 import moment from 'moment';
 import Ajv from 'ajv';
 import File from 'formidable/lib/file';
-import { assert, transformExtends, transformType, ref } from './utils';
+import {
+  assert, transformExtends, ref, propsToSchema
+} from './utils';
 
 const converts = {
   'date': v => moment.utc(v, 'YYYY-MM-DD').toDate(),
@@ -53,29 +55,17 @@ export default class Validator {
     assert(schemaName, 'schemaName is required');
 
     const { name, parents } = transformExtends(schemaName);
-
-    let schema = null;
-
-    if (props && Object.keys(props).length) {
-      const properties = {};
-      const requiredArr = options.required || [];
-      Object.keys(props).forEach((k) => {
-        const { type, required, ...others } = props[k];
-        const typeObj = transformType(type);
-        properties[k] = { ...typeObj, ...others };
-        if (required) {
-          requiredArr.push(k);
-        }
-      });
-      const required = [...new Set(requiredArr)];
-      schema = { type: 'object', properties, required };
-    }
+    let schema = propsToSchema(props, options);
 
     if (parents.length) {
       if (schema) {
         parents.push(schema);
       }
-      schema = { ...options, allOf: parents };
+      if (parents.length === 1) {
+        schema = { ...options, ...parents[0] };
+      } else {
+        schema = { ...options, allOf: parents };
+      }
     } else {
       schema = { ...options, ...schema };
     }
