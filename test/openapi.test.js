@@ -425,7 +425,7 @@ describe('OpenAPI', () => {
       tags: ['user'],
       summary: 'get user infomation',
       params: {
-        id: { type: 'number', schema: { minimum: 100 } },
+        id: { type: 'number', minimum: 100 },
         type: { type: 'number', in: 'query' },
         token: { type: 'string', in: 'header' },
         sid: { type: 'string', in: 'cookie' }

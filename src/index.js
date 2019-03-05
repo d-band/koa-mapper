@@ -39,14 +39,17 @@ export default class Mapper {
 
   info(data) {
     this.rootDoc.info = data;
+    return this;
   }
 
   addTag(obj) {
     this.rootDoc.tags.push(obj);
+    return this;
   }
 
   addServer(obj) {
     this.rootDoc.servers.push(obj);
+    return this;
   }
 
   apiMiddleware() {
@@ -80,6 +83,7 @@ export default class Mapper {
 
   define(name, props, options) {
     this.validator.addSchema(name, props, options);
+    return this;
   }
 
   use(path, ...middlewares) {

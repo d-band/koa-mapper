@@ -93,18 +93,25 @@ export default class Layer {
       };
     });
     params && Object.keys(params).forEach((name) => {
-      const { type, ...others } = params[name];
-      const p = { ...others, name };
-      if (type) {
-        p.schema = { ...p.schema, ...transformType(type) };
+      const obj = params[name] || {};
+      const param = takeInOptions(obj, 'param');
+      const schema = takeInOptions(obj, 'schema');
+
+      param.name = name;
+
+      if (obj.type) {
+        extend(true, schema, transformType(obj.type));
+      }
+      if (Object.keys(schema).length) {
+        param.schema = extend(true, param.schema, schema);
       }
       const find = inPath[name];
       if (find) {
         const { index } = find;
-        parameters[index] = { ...parameters[index], ...p };
+        parameters[index] = extend(true, parameters[index], param);
         assert(parameters[index].in === 'path', `${name} must be in path`);
       } else {
-        parameters.push(p);
+        parameters.push(param);
       }
     });
     this.parameters = parameters;
@@ -154,8 +161,10 @@ export default class Layer {
     if (!body || !validator) return;
     this.bodySchema = propsToSchema(body);
     if (this.bodySchema) {
-      this.bodyValidate = validator.compile(this.bodySchema);
       this.stack.unshift((ctx, next) => {
+        if (!this.bodyValidate) {
+          this.bodyValidate = validator.compile(this.bodySchema);
+        }
         const { throwBodyError } = this.opts;
         const valid = this.bodyValidate(ctx.request.body);
         ctx.bodyErrors = this.bodyValidate.errors;

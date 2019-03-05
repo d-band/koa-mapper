@@ -1,4 +1,6 @@
 import qs from 'qs';
+import extend from 'extend';
+
 export const debug = require('debug')('koa-mapper');
 
 export function safeDecodeURIComponent(text) {
@@ -46,7 +48,15 @@ export function toURI(base, query) {
 export function takeInOptions(opts, key) {
   const map = {
     'path': ['summary', 'description'],
-    'method': ['tags', 'summary', 'description', 'externalDocs', 'responses', 'callbacks', 'deprecated', 'security', 'servers']
+    'method': ['tags', 'summary', 'description', 'externalDocs', 'responses', 'callbacks', 'deprecated', 'security', 'servers'],
+    'schema': [
+      'items', 'title', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength',
+      'pattern', 'maxItems', 'minItems', 'uniqueItems', 'maxProperties', 'minProperties', 'enum', 'default', 'format'
+    ],
+    'param': [
+      'name', 'in', 'description', 'required', 'deprecated', 'allowEmptyValue',
+      'style', 'explode', 'allowReserved', 'schema', 'example', 'examples'
+    ]
   };
   const obj = {};
   map[key].forEach((k) => {
@@ -140,13 +150,17 @@ export function propsToSchema(props, options = {}) {
     Object.keys(props).forEach((k) => {
       const { type, required, ...others } = props[k];
       const typeObj = transformType(type);
-      properties[k] = { ...typeObj, ...others };
+      properties[k] = extend(true, others, typeObj);
       if (required) {
         requiredArr.push(k);
       }
     });
     const required = [...new Set(requiredArr)];
-    return { type: 'object', properties, required };
+    const schema = { type: 'object', properties };
+    if (required.length) {
+      schema.required = required;
+    }
+    return schema;
   }
   return null;
 }

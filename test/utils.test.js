@@ -117,8 +117,7 @@ describe('utils', () => {
       properties: {
         id: { type: 'number' },
         list: { type: 'array', items: { type: 'number' } }
-      },
-      required: []
+      }
     });
     expect(utils.propsToSchema({
       id: { type: 'number', required: true },
