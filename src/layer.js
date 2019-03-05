@@ -4,13 +4,12 @@ import ptr from 'path-to-regexp';
 import bodyParser from 'koa-body';
 import {
   debug, assert, safeDecodeURIComponent, takeInOptions,
-  transformType, layerId, toURI, validateError, propsToSchema
+  transformType, toURI, validateError, propsToSchema
 } from './utils';
 
 export default class Layer {
   constructor(path, methods, middlewares, opts) {
     this.opts = opts || {};
-    this.id = layerId();
     this.name = this.opts.name || null;
     this.methods = [];
     this.pathKeys = [];

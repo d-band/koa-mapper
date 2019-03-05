@@ -9,12 +9,6 @@ export function safeDecodeURIComponent(text) {
   }
 }
 
-let id = 0;
-export function layerId() {
-  id++;
-  return `mapper_layer_id_${id}`;
-}
-
 export function assert(value, message) {
   if (value) return;
   throw new Error(message);
