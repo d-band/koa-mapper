@@ -166,10 +166,8 @@ export default class Layer {
           this.bodyValidate = validator.compile(this.bodySchema);
         }
         const { throwBodyError } = this.opts;
-        const valid = this.bodyValidate({
-          ...ctx.request.body,
-          ...ctx.request.files
-        });
+        extend(ctx.request.body, ctx.request.files);
+        const valid = this.bodyValidate(ctx.request.body);
         ctx.bodyErrors = this.bodyValidate.errors;
         if (!valid && throwBodyError !== false) {
           if (typeof throwBodyError === 'function') {
