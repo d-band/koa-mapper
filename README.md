@@ -46,7 +46,7 @@ mapper.get('/users/:id', {
 
 mapper.post('/users', {
   body: {
-    users: { type: 'array<User>', in: 'query' }
+    users: { type: 'array<User>' }
   }
 }, (ctx) => {
   ctx.body = ctx.request.body;
