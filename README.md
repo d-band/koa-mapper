@@ -83,7 +83,7 @@ app.listen(3000);
 | sensitive | `boolean` | `false` | `sensitive` option for [path-to-regexp](https://github.com/pillarjs/path-to-regexp) |
 | strict | `boolean` | `false` | `strict` option for [path-to-regexp](https://github.com/pillarjs/path-to-regexp) |
 
-### `mapper.get|put|post|delete|del|patch(path, [options], ...middlewares) => Mapper`
+### `mapper.get|put|post|del(path, [options], ...middlewares) => Mapper`
 
 ```js
 type options = {
@@ -94,19 +94,27 @@ type options = {
   throwBodyError: function, // like Mapper options.throwBodyError
   params: Params, // OpenAPI parameters definition
   body: Body, // OpenAPI requestBody schema definition
-  ...others, // OpenAPI [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object)
+  ...others, // Fields of OpenAPI Operation Object
 }
 ```
+
+> More fields of [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object)
 
 ```
 type Params = {
   in: string, // parameter in: `path`, `query`, `header`, `cookie`
   type: string, // parameter type
-  ...others, // OpenAPI [Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject)
+  ...others, // Fields of OpenAPI Parameter Object
 }
 ```
 
-> `type` support `array`, `boolean`, `integer`, `null`, `number`, `object`, `string`, `date`, `time`, `datetime`, `regex`, `array<type>`. like: `array<string>`, `Pet`, `array<Pet>`
+> More fields of OpenAPI [Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#parameterObject)
+
+`type` support:
+
+* Basic type: `array`, `boolean`, `integer`, `null`, `number`, `object`, `string`, `date`, `time`, `datetime`, `regex`
+* Array type: `array<string>`, `array<number|string>`
+* Custom type: `Pet`, `array<Pet>`
 
 ```
 type Body = string | {
@@ -114,10 +122,13 @@ type Body = string | {
 }
 ```
 
-> examples: `body: 'Pet'` => `body: { $ref: 'Pet' }`, `body: { id: { type: 'number' } }` => `body: { type: 'object', properties: { id: { type: 'number' } }}`
+body examples:
+
+* `body: 'Pet'` => `body: { $ref: 'Pet' }`
+* `body: { id: { type: 'number' } }` => `body: { type: 'object', properties: { id: { type: 'number' } }}`
 
 
-### `mapper.define(schemaName, properties, options) => Mapper` alias `mapper.schema()`
+### `mapper.schema(name, properties, options) => Mapper` alias `mapper.define()`
 
 ```
 mapper.schema('Tag', {
@@ -139,6 +150,44 @@ mapper.schema('Pet', {
   required: ['name', 'photoUrls']
 });
 ```
+
+Support type extends:
+
+```
+mapper.schema('Model', {
+  id: { type: 'number' },
+  createdAt: { type: 'datetime' },
+  updatedAt: { type: 'datetime' }
+});
+mapper.schema('User: Model', {
+  name: { type: 'string' }
+});
+```
+
+### BodyParser
+
+```
+mapper.post('/users', {
+  body: 'User'
+}, (ctx) => {
+  const { id, name } = ctx.request.body;
+});
+```
+
+Multipart and file upload:
+
+```
+mapper.post('/uploadImage', {
+  bodyparser: { multipart: true },
+  body: {
+    user: { type: 'number' },
+    image: { type: 'file' }
+  }
+}, (ctx) => {
+  const { user, image } = ctx.request.body;
+});
+```
+
 ## License
 
 MIT
