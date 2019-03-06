@@ -131,6 +131,24 @@ describe('Validator', () => {
     expect(validate({ file: {} })).to.be.true; // eslint-disable-line no-unused-expressions
   });
 
+  it('validator format', () => {
+    const validator = new Validator();
+    let validate = validator.compile({
+      properties: {
+        num1: { type: 'number', format: 'int32' },
+        num2: { type: 'number', format: 'int64' }
+      }
+    });
+    expect(validate({ num1: 123 })).to.be.true; // eslint-disable-line no-unused-expressions
+    expect(validate({ num1: 12.3 })).to.be.false; // eslint-disable-line no-unused-expressions
+    expect(validate({ num1: 2147483648 })).to.be.false; // eslint-disable-line no-unused-expressions
+    expect(validate({ num1: -2147483649 })).to.be.false; // eslint-disable-line no-unused-expressions
+    expect(validate({ num2: 123 })).to.be.true; // eslint-disable-line no-unused-expressions
+    expect(validate({ num2: 12.3 })).to.be.false; // eslint-disable-line no-unused-expressions
+    expect(validate({ num2: 9007199254740992 })).to.be.false; // eslint-disable-line no-unused-expressions
+    expect(validate({ num2: -9007199254740992 })).to.be.false; // eslint-disable-line no-unused-expressions
+  });
+
   it('validator schema', () => {
     const validator = new Validator();
     validator.addSchema('User: Model', {

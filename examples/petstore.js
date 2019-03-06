@@ -225,7 +225,7 @@ mapper.post('/pet/:petId/uploadImage', {
   params: {
     petId: {
       type: 'integer',
-      // format: 'int64',
+      format: 'int64',
       description: 'ID of pet to update',
       required: true
     }

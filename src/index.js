@@ -22,7 +22,7 @@ export default class Mapper {
     this.stack = [];
     this.routes = this.middleware;
     this.schema = this.define;
-    this.validator = new Validator();
+    this.validator = new Validator(this.opts.validator);
     this.rootDoc = {
       openapi: '3.0.2',
       info: {},

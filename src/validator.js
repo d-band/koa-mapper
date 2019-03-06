@@ -11,11 +11,16 @@ const converts = {
   'date-time': v => moment.utc(v).toDate()
 };
 
+const INT32_MIN = -1 * Math.pow(2, 31);
+const INT32_MAX = Math.pow(2, 31) - 1;
+
 export default class Validator {
-  constructor() {
+  constructor(opts = {}) {
     this.ajv = new Ajv({
       coerceTypes: true,
-      useDefaults: true
+      useDefaults: true,
+      unknownFormats: 'ignore',
+      ...opts
     });
     this.ajv.addKeyword('convert', {
       compile(convert, schema) {
@@ -42,6 +47,18 @@ export default class Validator {
           };
         }
         return () => true;
+      }
+    });
+    this.ajv.addFormat('int32', {
+      type: 'number',
+      validate(n) {
+        return Number.isSafeInteger(n) && n >= INT32_MIN && n <= INT32_MAX;
+      }
+    });
+    this.ajv.addFormat('int64', {
+      type: 'number',
+      validate(n) {
+        return Number.isSafeInteger(n);
       }
     });
     this.schemas = {};
