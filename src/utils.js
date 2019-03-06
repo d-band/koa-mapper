@@ -48,10 +48,14 @@ export function toURI(base, query) {
 export function takeInOptions(opts, key) {
   const map = {
     'path': ['summary', 'description'],
-    'method': ['tags', 'summary', 'description', 'externalDocs', 'responses', 'callbacks', 'deprecated', 'security', 'servers'],
+    'method': [
+      'tags', 'summary', 'description', 'externalDocs', 'responses',
+      'callbacks', 'deprecated', 'security', 'servers', 'requestBody'
+    ],
     'schema': [
-      'items', 'title', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength',
-      'pattern', 'maxItems', 'minItems', 'uniqueItems', 'maxProperties', 'minProperties', 'enum', 'default', 'format'
+      'items', 'title', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum',
+      'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'maxItems', 'minItems',
+      'uniqueItems', 'maxProperties', 'minProperties', 'enum', 'default', 'format'
     ],
     'param': [
       'name', 'in', 'description', 'required', 'deprecated', 'allowEmptyValue',
