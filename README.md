@@ -75,10 +75,10 @@ app.listen(3000);
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | prefix | `string` | `''` | the path prefix for a Mapper |
-| openURL | `string|false` | `/openapi.json` | OpenAPI route, `false` to disable OpenAPI |
-| bodyparser | `object|boolean` | `false` | `koa-body` options, `true|{}` to enable body parser |
-| throwParamsError | `function|boolean` | `utils.validateError` | Throw error for params invalid |
-| throwBodyError | `function|boolean` | `utils.validateError` | Throw error for body invalid |
+| openURL | `string` or `false` | `/openapi.json` | OpenAPI route, `false` to disable OpenAPI |
+| bodyparser | `object` or `boolean` | `false` | `koa-body` options, `true|{}` to enable body parser |
+| throwParamsError | `function` or `boolean` | `utils.validateError` | Throw error for params invalid |
+| throwBodyError | `function` or `boolean` | `utils.validateError` | Throw error for body invalid |
 | validator | `object` | `{}` | [`ajv options`](https://github.com/epoberezkin/ajv#options) |
 | sensitive | `boolean` | `false` | `sensitive` option for [path-to-regexp](https://github.com/pillarjs/path-to-regexp) |
 | strict | `boolean` | `false` | `strict` option for [path-to-regexp](https://github.com/pillarjs/path-to-regexp) |
