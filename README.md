@@ -89,7 +89,7 @@ app.listen(3000);
 type options = {
   name: string, // route name, default null
   prefix: string, // route prefix, default ''
-  bodyparser: function, // like Mapper options.bodyparser
+  bodyparser: object|boolean, // like Mapper options.bodyparser
   throwParamsError: function, // like Mapper options.throwParamsError
   throwBodyError: function, // like Mapper options.throwBodyError
   params: Params, // OpenAPI parameters definition
