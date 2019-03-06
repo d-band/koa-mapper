@@ -33,7 +33,7 @@ export default class Mapper {
     this._applyMethods();
     if (this.opts.openURL !== false) {
       const openURL = this.opts.openURL || '/openapi.json';
-      this.get(openURL, this.apiMiddleware());
+      this.get(openURL, { name: 'openapi' }, this.apiMiddleware());
     }
   }
 
@@ -219,7 +219,8 @@ export default class Mapper {
       sensitive: opts.sensitive || this.opts.sensitive || false,
       strict: opts.strict || this.opts.strict || false,
       bodyparser: opts.bodyparser || this.opts.bodyparser,
-      throwParamsError: opts.throwParamsError || this.opts.throwParamsError
+      throwParamsError: opts.throwParamsError || this.opts.throwParamsError,
+      throwBodyError: opts.throwBodyError || this.opts.throwBodyError
     });
 
     // add parameter middlewares
