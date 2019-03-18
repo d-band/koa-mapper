@@ -212,7 +212,7 @@ export default class Layer {
         }, {});
         return this.url(obj, {
           encode: v => `{${v}}`,
-          skipMatch: true
+          noValidate: true
         });
       };
       this.setParameters();
