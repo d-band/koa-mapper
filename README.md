@@ -100,7 +100,7 @@ type options = {
 
 > More fields of [Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#operation-object)
 
-```
+```js
 type Params = {
   in: string, // parameter in: `path`, `query`, `header`, `cookie`
   type: string, // parameter type
@@ -116,7 +116,7 @@ type Params = {
 * Array type: `array<string>`, `array<number|string>`
 * Custom type: `Pet`, `array<Pet>`
 
-```
+```js
 type Body = string | {
   [property]: Schema
 }
@@ -130,7 +130,7 @@ body examples:
 
 ### `mapper.schema(name, properties, options) => Mapper` alias `mapper.define()`
 
-```
+```js
 mapper.schema('Tag', {
   id: { type: 'integer', format: 'int64' },
   name: { type: 'string' }
@@ -153,7 +153,7 @@ mapper.schema('Pet', {
 
 Support type extends:
 
-```
+```js
 mapper.schema('Model', {
   id: { type: 'number' },
   createdAt: { type: 'datetime' },
@@ -166,7 +166,7 @@ mapper.schema('User: Model', {
 
 ### BodyParser
 
-```
+```js
 mapper.post('/users', {
   body: 'User'
 }, (ctx) => {
@@ -176,7 +176,7 @@ mapper.post('/users', {
 
 Multipart and file upload:
 
-```
+```js
 mapper.post('/uploadImage', {
   bodyparser: { multipart: true },
   body: {
