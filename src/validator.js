@@ -17,7 +17,7 @@ const INT32_MAX = Math.pow(2, 31) - 1;
 export default class Validator {
   constructor(opts = {}) {
     this.ajv = new Ajv({
-      coerceTypes: true,
+      coerceTypes: 'array',
       useDefaults: true,
       unknownFormats: 'ignore',
       ...opts
