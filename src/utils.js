@@ -47,17 +47,17 @@ export function toURI(base, query) {
 
 export function takeInOptions(opts, key) {
   const map = {
-    'path': ['summary', 'description'],
-    'method': [
+    path: ['summary', 'description'],
+    method: [
       'tags', 'summary', 'description', 'externalDocs', 'responses',
       'callbacks', 'deprecated', 'security', 'servers', 'requestBody'
     ],
-    'schema': [
+    schema: [
       'items', 'title', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum',
       'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'maxItems', 'minItems',
       'uniqueItems', 'maxProperties', 'minProperties', 'enum', 'default', 'format'
     ],
-    'param': [
+    param: [
       'name', 'in', 'description', 'required', 'deprecated', 'allowEmptyValue',
       'style', 'explode', 'allowReserved', 'schema', 'example', 'examples'
     ]
@@ -88,7 +88,7 @@ export function getMixType(type) {
   FORMATS.forEach((t) => {
     types[t] = { type: 'string', format: t, convert: true };
   });
-  types['datetime'] = types['date-time'];
+  types.datetime = types['date-time'];
 
   const hasAnd = /&/.test(type);
   const hasOr = /\|/.test(type);
@@ -125,7 +125,9 @@ export function transformExtends(name) {
 }
 
 export function transformType(type) {
-  type = type.trim();
+  if (type) {
+    type = type.trim();
+  }
   if (!type) return {};
 
   const arrayRE = /array\s?<([^<>]+)>/i;

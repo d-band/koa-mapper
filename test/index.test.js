@@ -243,8 +243,6 @@ describe('Mapper', () => {
       prefix: '/:fid/posts'
     });
 
-    let server;
-
     posts
       .get('/', (ctx, next) => {
         ctx.status = 204;
@@ -257,7 +255,7 @@ describe('Mapper', () => {
 
     forums.use(posts.routes());
 
-    server = http.createServer(app.use(forums.routes()).callback());
+    const server = http.createServer(app.use(forums.routes()).callback());
 
     request(server)
       .get('/forums/1/posts')
@@ -294,8 +292,6 @@ describe('Mapper', () => {
       prefix: '/posts'
     });
 
-    let server;
-
     posts
       .get('/', (ctx, next) => {
         ctx.status = 204;
@@ -308,7 +304,7 @@ describe('Mapper', () => {
 
     forums.use('/forums/:fid', posts.routes());
 
-    server = http.createServer(app.use(forums.routes()).callback());
+    const server = http.createServer(app.use(forums.routes()).callback());
 
     request(server)
       .get('/api/forums/1/posts')
@@ -610,7 +606,8 @@ describe('Mapper', () => {
           if (err) return done(err);
           // the 'Allow' header is not set when throwing
           res.header.should.not.have.property('allow');
-          res.body.should.eql({ error: 'Custom Not Allowed Error',
+          res.body.should.eql({
+            error: 'Custom Not Allowed Error',
             statusCode: 405,
             otherStuff: true
           });
@@ -702,7 +699,8 @@ describe('Mapper', () => {
           if (err) return done(err);
           // the 'Allow' header is not set when throwing
           res.header.should.not.have.property('allow');
-          res.body.should.eql({ error: 'Custom Not Implemented Error',
+          res.body.should.eql({
+            error: 'Custom Not Implemented Error',
             statusCode: 501,
             otherStuff: true
           });
@@ -742,7 +740,7 @@ describe('Mapper', () => {
         .end((err, res) => {
           if (err) return done(err);
           res.header.should.have.property('allow', 'HEAD, GET');
-          let allowHeaders = res.res.rawHeaders.filter(item => item === 'Allow');
+          const allowHeaders = res.res.rawHeaders.filter(item => item === 'Allow');
           expect(allowHeaders.length).to.eql(1);
           done();
         });
@@ -1256,7 +1254,7 @@ describe('Mapper', () => {
       mapper
         // intentional random order
         .param('a', (id, ctx, next) => {
-          ctx.state.loaded = [ id ];
+          ctx.state.loaded = [id];
           return next();
         })
         .param('d', (id, ctx, next) => {
@@ -1284,7 +1282,7 @@ describe('Mapper', () => {
         .end((err, res) => {
           if (err) return done(err);
           res.should.have.property('body');
-          res.body.should.eql([ '1', '2', '3', '4' ]);
+          res.body.should.eql(['1', '2', '3', '4']);
           done();
         });
     });

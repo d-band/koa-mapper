@@ -18,13 +18,20 @@ mapper.get('/users/:id', {
 });
 
 mapper.post('/users', {
-  body: {
-    type: 'User'
-  }
+  body: 'User'
 }, ctx => {
   ctx.body = ctx.request.body;
 });
 
+mapper.post('/pets', {
+  body: 'Pet'
+}, ctx => {
+  ctx.body = ctx.request.body;
+});
+
+mapper.define('Pet', null, {
+  $ref: 'https://example.com#mySchema.json'
+});
 mapper.define('User', {
   id: { type: 'number', required: true },
   name: { type: 'string', required: true }

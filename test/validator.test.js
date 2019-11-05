@@ -133,7 +133,7 @@ describe('Validator', () => {
 
   it('validator format', () => {
     const validator = new Validator();
-    let validate = validator.compile({
+    const validate = validator.compile({
       properties: {
         num1: { type: 'number', format: 'int32' },
         num2: { type: 'number', format: 'int64' }
@@ -173,7 +173,7 @@ describe('Validator', () => {
       Model: {
         type: 'object',
         properties: {
-          id: { 'type': 'number' }
+          id: { type: 'number' }
         },
         required: ['id']
       },

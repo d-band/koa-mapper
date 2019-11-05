@@ -6,8 +6,8 @@ import {
 } from './utils';
 
 const converts = {
-  'date': v => moment.utc(v, 'YYYY-MM-DD').toDate(),
-  'time': v => moment.utc(v, 'HH:mm:ssZ.SSS').toDate(),
+  date: v => moment.utc(v, 'YYYY-MM-DD').toDate(),
+  time: v => moment.utc(v, 'HH:mm:ssZ.SSS').toDate(),
   'date-time': v => moment.utc(v).toDate()
 };
 
