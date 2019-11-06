@@ -30,7 +30,7 @@ mapper.post('/pets', {
 });
 
 mapper.define('Pet', null, {
-  $ref: 'https://example.com#mySchema.json'
+  $ref: 'http://localhost:3000/openapi.json#/components/schemas/User'
 });
 mapper.define('User', {
   id: { type: 'number', required: true },

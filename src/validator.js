@@ -2,7 +2,7 @@ import moment from 'moment';
 import Ajv from 'ajv';
 import File from 'formidable/lib/file';
 import {
-  assert, transformExtends, ref, propsToSchema
+  assert, transformExtends, ref, propsToSchema, loadSchema
 } from './utils';
 
 const converts = {
@@ -20,6 +20,7 @@ export default class Validator {
       coerceTypes: 'array',
       useDefaults: true,
       unknownFormats: 'ignore',
+      loadSchema,
       ...opts
     });
     this.ajv.addKeyword('convert', {
@@ -93,5 +94,9 @@ export default class Validator {
 
   compile(schema) {
     return this.ajv.compile(schema);
+  }
+
+  compileAsync(schema) {
+    return this.ajv.compileAsync(schema);
   }
 }

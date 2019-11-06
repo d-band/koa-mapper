@@ -117,7 +117,7 @@ export default class Layer {
     this.parameters = parameters;
   }
 
-  getParamsValidate() {
+  async getParamsValidate() {
     if (this.paramsValidate) {
       return this.paramsValidate;
     }
@@ -139,7 +139,7 @@ export default class Layer {
     if (!hasProps) return null;
     const { validator } = this.opts;
     if (!validator) return null;
-    this.paramsValidate = validator.compile({
+    this.paramsValidate = await validator.compileAsync({
       type: 'object',
       properties,
       required
@@ -161,9 +161,9 @@ export default class Layer {
     if (!body || !validator) return;
     this.bodySchema = propsToSchema(body);
     if (this.bodySchema) {
-      this.stack.unshift((ctx, next) => {
+      this.stack.unshift(async (ctx, next) => {
         if (!this.bodyValidate) {
-          this.bodyValidate = validator.compile(this.bodySchema);
+          this.bodyValidate = await validator.compileAsync(this.bodySchema);
         }
         const { throwBodyError } = this.opts;
         extend(ctx.request.body, ctx.request.files);
@@ -176,7 +176,7 @@ export default class Layer {
             validateError(ctx.bodyErrors);
           }
         }
-        return next();
+        await next();
       });
     }
   }
@@ -224,7 +224,7 @@ export default class Layer {
     return this.regexp.test(path);
   }
 
-  params(path, ctx) {
+  async params(path, ctx) {
     // "query", "header", "path" or "cookie"
     const params = ctx.params || {};
     if (this.opts.ignoreParams) {
@@ -265,7 +265,7 @@ export default class Layer {
       }
       ctx._pathParsed = true;
     }
-    const validate = this.getParamsValidate();
+    const validate = await this.getParamsValidate();
     if (validate) {
       const valid = validate(params);
       ctx.paramsErrors = validate.errors;

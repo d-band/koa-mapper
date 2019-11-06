@@ -144,10 +144,10 @@ export default class Mapper {
       }
 
       const layerChain = matchedLayers.reduce((memo, layer) => {
-        memo.push((ctx, next) => {
-          ctx.params = layer.params(path, ctx);
+        memo.push(async (ctx, next) => {
+          ctx.params = await layer.params(path, ctx);
           ctx.routeName = layer.name;
-          return next();
+          await next();
         });
         return memo.concat(layer.stack);
       }, []);

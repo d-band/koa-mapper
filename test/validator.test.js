@@ -1,3 +1,4 @@
+import Koa from 'koa';
 import { expect } from 'chai';
 import File from 'formidable/lib/file';
 import Validator from '../src/validator';
@@ -215,5 +216,48 @@ describe('Validator', () => {
         id: '456'
       }
     })).to.be.false;
+  });
+
+  it('validator compileAsync', (done) => {
+    const app = new Koa();
+    app.use((ctx) => {
+      ctx.body = {
+        schemas: {
+          Pet: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              name: { type: 'string' }
+            },
+            required: ['id', 'name']
+          }
+        }
+      };
+    });
+    const server = app.listen(3000, () => {
+      const validator = new Validator();
+      validator.addSchema('Pet', null, {
+        $ref: 'http://localhost:3000#/schemas/Pet'
+      });
+      validator.compileAsync({
+        $ref: '#/components/schemas/Pet'
+      }).then((validate) => {
+        // eslint-disable-next-line no-unused-expressions
+        expect(validate({
+          id: 123,
+          name: 'hello'
+        })).to.be.true;
+        // eslint-disable-next-line no-unused-expressions
+        expect(validate({
+          id: 'abc',
+          name: 'hello'
+        })).to.be.false;
+        server.close();
+        done();
+      }).catch((e) => {
+        server.close();
+        done(e);
+      });
+    });
   });
 });

@@ -1,3 +1,5 @@
+import path from 'path';
+import Koa from 'koa';
 import { expect } from 'chai';
 import * as utils from '../src/utils';
 
@@ -131,6 +133,38 @@ describe('utils', () => {
         list: { type: 'array', items: { type: 'number' } }
       },
       required: ['id', 'list']
+    });
+  });
+
+  it('util#loadSchema() local file', (done) => {
+    const pkgFile = path.join(__dirname, '..', 'package.json');
+    utils.loadSchema(pkgFile).then((data) => {
+      expect(data.name).to.equal('koa-mapper');
+      done();
+    });
+  });
+
+  it('util#loadSchema() local file with error', (done) => {
+    utils.loadSchema('not-found-file').catch((e) => {
+      expect(e).to.be.an('error');
+      done();
+    });
+  });
+
+  it('util#loadSchema() remote url', (done) => {
+    const app = new Koa();
+    app.use((ctx) => {
+      ctx.body = { name: 'koa-mapper' };
+    });
+    const server = app.listen(3000, () => {
+      utils.loadSchema('http://localhost:3000').then((data) => {
+        expect(data.name).to.equal('koa-mapper');
+        server.close();
+        done();
+      }).catch((e) => {
+        server.close();
+        done(e);
+      });
     });
   });
 });

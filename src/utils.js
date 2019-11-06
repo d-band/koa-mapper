@@ -1,5 +1,7 @@
+import fs from 'fs';
 import qs from 'qs';
 import extend from 'extend';
+import fetch from 'node-fetch';
 
 export const debug = require('debug')('koa-mapper');
 
@@ -169,4 +171,20 @@ export function propsToSchema(props, options = {}) {
     return schema;
   }
   return null;
+}
+
+export const isURL = s => /^https?:\/\//gi.test(s);
+
+export function loadSchema(url, options) {
+  if (isURL(url)) {
+    return fetch(url, options).then(res => res.json());
+  }
+  return new Promise((resolve, reject) => {
+    fs.readFile(url, (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(JSON.parse(data));
+    });
+  });
 }
