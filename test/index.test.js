@@ -1091,9 +1091,9 @@ describe('Mapper', () => {
         ctx.status = 204;
       });
       let url = mapper.url('books', { category: 'programming', title: 'how to node' });
-      url.should.equal('/programming/how%20to%20node');
+      url.should.equal('/programming/how to node');
       url = mapper.url('books', ['programming', 'how to node']);
-      url.should.equal('/programming/how%20to%20node');
+      url.should.equal('/programming/how to node');
       done();
     });
 
@@ -1112,9 +1112,9 @@ describe('Mapper', () => {
       mapper.use(embeddedMapper.routes());
       app.use(mapper.routes());
       let url = mapper.url('chapters', { chapterName: 'Learning ECMA6', pageNumber: 123 });
-      url.should.equal('/books/chapters/Learning%20ECMA6/123');
+      url.should.equal('/books/chapters/Learning ECMA6/123');
       url = mapper.url('chapters', ['Learning ECMA6', 123]);
-      url.should.equal('/books/chapters/Learning%20ECMA6/123');
+      url.should.equal('/books/chapters/Learning ECMA6/123');
       done();
     });
 
@@ -1136,7 +1136,7 @@ describe('Mapper', () => {
       mapper.use(embeddedMapper.routes());
       app.use(mapper.routes());
       const url = mapper.url('chapters', { chapterName: 'Learning ECMA6', pageNumber: 123 });
-      url.should.equal('/books/chapters/Learning%20ECMA6/pages/123');
+      url.should.equal('/books/chapters/Learning ECMA6/pages/123');
       done();
     });
 

@@ -171,7 +171,7 @@ describe('Layer', () => {
     it('escapes using encodeURIComponent()', () => {
       const route = new Layer('/:category/:title', ['get'], [() => {}], { name: 'books' });
       const url = route.url({ category: 'programming', title: 'how to node' });
-      url.should.equal('/programming/how%20to%20node');
+      url.should.equal('/programming/how to node');
     });
   });
   describe('Layer#bodyparser', () => {

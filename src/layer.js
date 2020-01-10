@@ -1,6 +1,6 @@
 import qs from 'qs';
 import extend from 'extend';
-import ptr from 'path-to-regexp';
+import * as ptr from 'path-to-regexp';
 import bodyParser from 'koa-body';
 import {
   debug, assert, safeDecodeURIComponent, takeInOptions,
@@ -191,7 +191,7 @@ export default class Layer {
 
       const tokens = ptr.parse(this.path, this.opts);
       this.pathKeys = [];
-      this.regexp = ptr.tokensToRegExp(tokens, this.pathKeys, this.opts);
+      this.regexp = ptr.tokensToRegexp(tokens, this.pathKeys, this.opts);
       this.url = (params, options = {}) => {
         let replace = {};
         if (Array.isArray(params)) {
@@ -201,8 +201,8 @@ export default class Layer {
         } else {
           replace = params;
         }
-        const toPath = ptr.tokensToFunction(tokens);
-        const base = toPath(replace, options);
+        const toPath = ptr.tokensToFunction(tokens, options);
+        const base = toPath(replace);
         return toURI(base, options.query);
       };
       this.pathTemplate = () => {
@@ -212,7 +212,7 @@ export default class Layer {
         }, {});
         return this.url(obj, {
           encode: v => `{${v}}`,
-          noValidate: true
+          validate: false
         });
       };
       this.setParameters();
